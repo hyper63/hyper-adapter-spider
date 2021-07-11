@@ -1,9 +1,5 @@
-# README
+<h1 align="center">hyper-adapter-spider</h1>
 
-hyper adapter template for `data` port, use this template to create a hyper
-adapter.
-
-Replace `{{ADAPTER_NAME}}` with your adapter name in `mod.js`
 
 ## Testing
 
