@@ -3,7 +3,7 @@
 export default function (_env) {
 
   return Object.freeze({
-    upsert(o) => Promise.resolve({ ok: true }),
+    upsert: (o) => Promise.resolve({ ok: true }),
     start: ({ app, name }) => Promise.resolve({ ok: true }),
     get: ({ app, name }) => Promise.resolve({}),
     'delete': ({ app, name }) => Promise.resolve(),
