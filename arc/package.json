@@ -1,0 +1,17 @@
+{
+  "name": "arc",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@architect/architect": "^8.7.4",
+    "aws-sdk": "^2.948.0"
+  },
+  "dependencies": {
+    "chrome-aws-lambda": "^10.1.0",
+    "puppeteer-core": "^10.1.0",
+    "puppeteer-extra-plugin-anonymize-ua": "^2.2.17",
+    "puppeteer-extra-plugin-stealth": "^2.7.8",
+    "ramda": "^0.27.1"
+  }
+}
