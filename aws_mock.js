@@ -1,17 +1,17 @@
 // deno-lint-ignore-file
 
 let doc = {
-  app: 'test',
-  name: 'spider',
-  source: 'https://hyper.io',
+  app: "test",
+  name: "spider",
+  source: "https://hyper.io",
   depth: 1,
-  script: 'base64',
+  script: "base64",
   target: {
-    url: 'https://example.com',
-    secret: 'secret',
-    aud: 'http://aud.com',
-    sub: 'user1234'
-  }
+    url: "https://example.com",
+    secret: "secret",
+    aud: "http://aud.com",
+    sub: "user1234",
+  },
 };
 
 export default {
@@ -21,8 +21,8 @@ export default {
     putObject,
     deleteObject,
     listObjects,
-  }
-}
+  },
+};
 
 function createBucket(name) {
   return Promise.resolve(`/hyper-crawler-${name}`);
@@ -38,9 +38,9 @@ function getObject(svc, name) {
 }
 
 function deleteObject(svc, name) {
-  return Promise.resolve({ok: true})
+  return Promise.resolve({ ok: true });
 }
 
 function listObjects(name) {
-  return Promise.resolve([])
+  return Promise.resolve([]);
 }
