@@ -4,7 +4,7 @@ export { default as core } from "https://x.nest.land/hyper@1.3.11/mod.js";
 
 // Schema parsing deps
 export { default as validateFactorySchema } from "https://x.nest.land/hyper@1.3.11/utils/plugin-schema.js";
-export { data as validateDataAdapterSchema } from "https://x.nest.land/hyper-port-data@1.0.11/mod.js";
+export { crawler as validateDataAdapterSchema } from "https://x.nest.land/hyper-port-crawler@0.0.2/mod.js";
 
 // std lib deps
 export { assert, equal } from "https://deno.land/std@0.98.0/testing/asserts.ts";

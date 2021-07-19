@@ -1,6 +1,5 @@
 <h1 align="center">hyper-adapter-spider</h1>
 
-
 ## Testing
 
 run `./scripts/test.sh` to lint, check format, and run tests
