@@ -1,4 +1,7 @@
 import { ApiFactory, crocks, R } from "./deps.js";
+import aws from "./aws.js";
+import getLinks from "./lib/spider/get-links.js";
+import getContent from "./lib/spider/get-content.js";
 
 import adapter from "./adapter.js";
 import PORT_NAME from "./port_name.js";
@@ -44,5 +47,8 @@ function validate(options) {
   return () =>
     or(isNil(options.links), isNil(options.content))
       ? Left({ message: "links or content source not set!" })
-      : Right({ links: options.links, content: options.content });
+      : Right({
+        getLinks: getLinks(options.links),
+        getContent: getContent(options.content),
+      });
 }
