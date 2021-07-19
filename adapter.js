@@ -14,7 +14,17 @@ export default function ({ aws: { s3 } }) {
       createBucket(app)
         .chain(() => putObject(app, name, crawlerDoc))
         .toPromise(),
-    //start: ({ app, name }) => Promise.resolve({ ok: true }),
+    start: ({ app, name }) => {
+      // get crawlerDoc
+      // getLinks
+      // for each link
+      //   get content
+      //   push content to target
+
+    },
+    post: ({ app, name, doc }) => {
+      // create a manual content document
+    },
     get: ({ app, name }) => getObject(app, name).toPromise(),
     "delete": ({ app, name }) => deleteObject(app, name).toPromise(),
     list: (app) => listObjects(app, "").toPromise(),
