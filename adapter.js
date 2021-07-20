@@ -2,10 +2,10 @@ import { crocks, Queue, R } from "./deps.js";
 
 const { Async } = crocks;
 const queue = new Queue();
-const { compose, map } = R;
+const { compose, map, prop } = R;
 
 export default function (
-  { getLinks, getContent, publishContent, aws: { s3 } },
+  { getLinks, getContent, publishContent, publishData, aws: { s3 } },
 ) {
   const createBucket = Async.fromPromise(s3.createBucket);
   const putObject = Async.fromPromise(s3.putObject);
@@ -15,37 +15,45 @@ export default function (
   const doGetLinks = Async.fromPromise(getLinks);
   const doGetContent = Async.fromPromise(getContent);
   const doPublishContent = Async.fromPromise(publishContent);
+  const doPublishData = Async.fromPromise(publishData);
+
+  function log(msg) {
+    return (
+      v,
+    ) => (console.log(
+      `${new Date().toISOString()} - ${msg}: ${JSON.stringify(v)}`,
+    ),
+      v);
+  }
 
   function doCrawl(doc) {
     return () =>
-      doGetLinks(doc.source)
-        .map((links) => (console.log("GOT LINKS:", links), links))
+      Async.of(doc)
+        .map(log("CRAWL STARTED"))
+        .map(prop("source"))
+        .chain(doGetLinks)
+        .map(log("GOT LINKS"))
         .chain(compose(
           Async.all,
           map((link) =>
             doGetContent(link, doc.script)
-              .map((doc) => (console.log("GOT CONTENT:", doc), doc))
-              .map(({ title, content }) =>
-                `<!doctype html>
-<html>
-  <head>
-    <title>${title}</title>
-  </head>
-  <body>
-    <header><h1>${title}</h1></header>
-    <main>${content}</main>
-  </body>
-</html>
-`
+              .map(log("Got Content"))
+              .map(transformToHTML)
+              .map(log("Transformed Content"))
+              .chain((html) =>
+                doPublishContent({
+                  body: html,
+                  type: "text/html",
+                  ...doc.target,
+                })
               )
-              .map((doc) => (console.log("Transformed CONTENT:", doc), doc))
-              .chain(doPublishContent)
-              .map((r) => (console.log("Published:", r.ok), r))
+              .chain(() => doPublishData({ ...doc.attr }))
+              .map(log("Published"))
           ),
         ))
         .fork(
-          (e) => console.log(e.message),
-          (r) => console.log(JSON.stringify(r)),
+          log("CRAWL ERROR"),
+          log("CRAWL COMPLETED"),
         );
     //.chain()
   }
@@ -60,11 +68,26 @@ export default function (
         .map((doc) => queue.push(doCrawl(doc)))
         .map(() => ({ ok: true }))
         .toPromise(),
-    //post: ({ app, name, doc }) => {
-    // create a manual content document
-    //},
+    post: ({ app, name, doc }) => 
+      getObject(app, name)
+        .chain(job => doPublishContent({body: doc, ...job.target})) 
+        .chain(() => doPublishData({...job.attr}))   
+    ,
     get: ({ app, name }) => getObject(app, name).toPromise(),
     "delete": ({ app, name }) => deleteObject(app, name).toPromise(),
     list: (app) => listObjects(app, "").toPromise(),
   });
+}
+
+function transformToHTML({ title, content }) {
+  return `<!doctype html>
+<html>
+  <head>
+    <title>${title}</title>
+  </head>
+  <body>
+    <header><h1>${title}</h1></header>
+    <main>${content}</main>
+  </body>
+</html>`;
 }

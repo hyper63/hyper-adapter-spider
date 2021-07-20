@@ -12,6 +12,7 @@ const crawlerDoc = {
   source: "https://hyper.io",
   depth: 1,
   script: "base64",
+  attr: { org: "1", group: "RED" },
   target: {
     url: "https://example.com",
     secret: "secret",
@@ -21,10 +22,12 @@ const crawlerDoc = {
 };
 
 //const getLinks = () => new Promise(resolve => setTimeout(() => resolve(['https://example.com']), 2000));
-const getLinks = () => Promise.resolve(["https://example.com"]);
+const getLinks = () =>
+  Promise.resolve(["https://example.com", "https://example.com/about"]);
 const getContent = () => Promise.resolve({ title: "Hello", content: "World" });
 const publishContent = () => Promise.resolve({ ok: true });
-const env = { getLinks, getContent, publishContent, aws };
+const publishData = () => Promise.resolve({ ok: true });
+const env = { getLinks, getContent, publishContent, publishData, aws };
 
 test("start crawl", async () => {
   const a = Adapter(env);
