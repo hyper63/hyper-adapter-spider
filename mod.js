@@ -2,6 +2,8 @@ import { ApiFactory, crocks, R } from "./deps.js";
 import aws from "./aws.js";
 import getLinks from "./lib/spider/get-links.js";
 import getContent from "./lib/spider/get-content.js";
+import publishContent from "./lib/spider/publish-content.js";
+import publishData from "./lib/spider/publish-data.js";
 
 import adapter from "./adapter.js";
 import PORT_NAME from "./port_name.js";
@@ -50,5 +52,7 @@ function validate(options) {
       : Right({
         getLinks: getLinks(options.links),
         getContent: getContent(options.content),
+        publishContent,
+        publishData,
       });
 }

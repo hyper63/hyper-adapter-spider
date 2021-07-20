@@ -6,6 +6,7 @@ let doc = {
   source: "https://hyper.io",
   depth: 1,
   script: "base64",
+  attr: { org: "1", group: "RED" },
   target: {
     url: "https://example.com",
     secret: "secret",
