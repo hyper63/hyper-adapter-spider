@@ -47,6 +47,7 @@ export default function (
                   ...doc.target,
                 })
               )
+              // need to send same criteria plus doc. name for doPublishData
               .chain(() => doPublishData({ ...doc.attr }))
               .map(log("Published"))
           ),
@@ -71,7 +72,18 @@ export default function (
     post: ({ app, name, doc }) =>
       getObject(app, name)
         .chain((job) => doPublishContent({ body: doc, ...job.target }))
-        .chain(() => doPublishData({ ...job.attr })),
+        // need to send same criteria plus doc. name for doPublishData
+        .chain(({id}) => doPublishData({ 
+          name: `${id}.metadata.json`,
+          body: {
+            DocumentId: id,
+            Title: doc.title,
+            Attributes: {
+              ...job.attr
+            },
+            ContentType: 'HTML'
+          },
+        })),
     get: ({ app, name }) => getObject(app, name).toPromise(),
     "delete": ({ app, name }) => deleteObject(app, name).toPromise(),
     list: (app) => listObjects(app, "").toPromise(),
