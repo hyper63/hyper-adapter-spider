@@ -1,6 +1,6 @@
 import "https://deno.land/x/dotenv@v2.0.0/load.ts";
 
-import { sha256 } from './deps.js'
+import { sha256 } from "./deps.js";
 import { assert, equal } from "./dev_deps.js";
 import Adapter from "./adapter.js";
 import aws from "./aws_mock.js";
@@ -26,10 +26,10 @@ const crawlerDoc = {
 const getLinks = () =>
   Promise.resolve(["https://example.com", "https://example.com/about"]);
 const getContent = () => Promise.resolve({ title: "Hello", content: "World" });
-const publishContent = ({body}) => {
-  const id = sha256(body, 'utf-8', 'hex')   
+const publishContent = ({ body }) => {
+  const id = sha256(body, "utf-8", "hex");
   return Promise.resolve({ ok: true, id });
-}
+};
 const publishData = () => Promise.resolve({ ok: true });
 const env = { getLinks, getContent, publishContent, publishData, aws };
 
