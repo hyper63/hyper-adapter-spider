@@ -68,11 +68,10 @@ export default function (
         .map((doc) => queue.push(doCrawl(doc)))
         .map(() => ({ ok: true }))
         .toPromise(),
-    post: ({ app, name, doc }) => 
+    post: ({ app, name, doc }) =>
       getObject(app, name)
-        .chain(job => doPublishContent({body: doc, ...job.target})) 
-        .chain(() => doPublishData({...job.attr}))   
-    ,
+        .chain((job) => doPublishContent({ body: doc, ...job.target }))
+        .chain(() => doPublishData({ ...job.attr })),
     get: ({ app, name }) => getObject(app, name).toPromise(),
     "delete": ({ app, name }) => deleteObject(app, name).toPromise(),
     list: (app) => listObjects(app, "").toPromise(),
