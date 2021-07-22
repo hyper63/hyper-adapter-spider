@@ -2,7 +2,7 @@ import { crocks, Queue, R } from "./deps.js";
 
 const { Async } = crocks;
 const queue = new Queue();
-const { compose, map, prop } = R;
+const { assoc, compose, map, prop } = R;
 
 export default function (
   { getLinks, getContent, publishContent, publishData, aws: { s3 } },
@@ -26,30 +26,47 @@ export default function (
       v);
   }
 
-  function doCrawl(doc) {
-    return () =>
+  function publish(job) {
+    return (doc) =>
       Async.of(doc)
+        .map(log('GOT Content'))
+        .map(transformToHTML)
+        .map(log("Transformed Content"))
+        .chain(({ html, data }) =>
+          doPublishContent({
+            body: html,
+            type: "text/html",
+            ...job.target,
+          })
+            // need to send same criteria plus doc. name for doPublishData
+            .chain(({ id }) => doPublishData({
+              name: `${id}.html.metadata.json`,
+              body: {
+                ...data,
+                DocumentId: `${id}.html`,
+                Attributes: {
+                  _source_uri: doc.link,
+                  ...job.attr
+                },
+              },
+              ...job.target
+            }))
+        )
+        .map(log("Published"))
+  }
+
+  function doCrawl(job) {
+    return () =>
+      Async.of(job)
         .map(log("CRAWL STARTED"))
         .map(prop("source"))
         .chain(doGetLinks)
         .map(log("GOT LINKS"))
         .chain(compose(
           Async.all,
-          map((link) =>
-            doGetContent(link, doc.script)
-              .map(log("Got Content"))
-              .map(transformToHTML)
-              .map(log("Transformed Content"))
-              .chain((html) =>
-                doPublishContent({
-                  body: html,
-                  type: "text/html",
-                  ...doc.target,
-                })
-              )
-              // need to send same criteria plus doc. name for doPublishData
-              .chain(() => doPublishData({ ...doc.attr }))
-              .map(log("Published"))
+          map(link => doGetContent(link)
+            .map(assoc('link', link))
+            .chain(publish(job)) // <- title, content, link
           ),
         ))
         .fork(
@@ -69,21 +86,11 @@ export default function (
         .map((doc) => queue.push(doCrawl(doc)))
         .map(() => ({ ok: true }))
         .toPromise(),
+    // doc should contain title, content, link
     post: ({ app, name, doc }) =>
       getObject(app, name)
-        .chain((job) => doPublishContent({ body: doc, ...job.target }))
-        // need to send same criteria plus doc. name for doPublishData
-        .chain(({id}) => doPublishData({ 
-          name: `${id}.metadata.json`,
-          body: {
-            DocumentId: id,
-            Title: doc.title,
-            Attributes: {
-              ...job.attr
-            },
-            ContentType: 'HTML'
-          },
-        })),
+        .chain((job) => publish(job)(doc))
+        .toPromise(),
     get: ({ app, name }) => getObject(app, name).toPromise(),
     "delete": ({ app, name }) => deleteObject(app, name).toPromise(),
     list: (app) => listObjects(app, "").toPromise(),
@@ -91,7 +98,7 @@ export default function (
 }
 
 function transformToHTML({ title, content }) {
-  return `<!doctype html>
+  const html = `<!doctype html>
 <html>
   <head>
     <title>${title}</title>
@@ -101,4 +108,9 @@ function transformToHTML({ title, content }) {
     <main>${content}</main>
   </body>
 </html>`;
+  const data = {
+    Title: title,
+    ContentType: 'HTML'
+  }
+  return ({ html, data })
 }
