@@ -1,0 +1,24 @@
+{
+  "$schema": "https://x.nest.land/eggs@0.3.8/src/schema.json",
+  "name": "hyper-adapter-spider",
+  "entry": "./mod.js",
+  "description": "Hyper Crawler port adapter for spider",
+  "homepage": "https://github.com/hyper63/hyper-adapter-spider",
+  "repo": "https://github.com/hyper63/hyper-adapter-spider",
+  "version": "0.0.1",
+  "unstable": false,
+  "unlisted": false,
+  "files": [
+    "./*",
+    "./lib/*"
+  ],
+  "ignore": [
+    "./package.json",
+    "./scripts/*",
+    "./.git*"
+  ],
+  "checkFormat": false,
+  "checkTests": false,
+  "checkInstallation": false,
+  "check": false
+}

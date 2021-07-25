@@ -12,4 +12,4 @@ const hyperConfig = {
   ],
 };
 
-core(hyperConfig);
+await core(hyperConfig);
