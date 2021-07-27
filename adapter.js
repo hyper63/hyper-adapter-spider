@@ -29,7 +29,7 @@ export default function (
   function publish(job) {
     return (doc) =>
       Async.of(doc)
-        .map(log('GOT Content'))
+        .map(log("GOT Content"))
         .map(transformToHTML)
         .map(log("Transformed Content"))
         .chain(({ html, data }) =>
@@ -39,20 +39,22 @@ export default function (
             ...job.target,
           })
             // need to send same criteria plus doc. name for doPublishData
-            .chain(({ id }) => doPublishData({
-              name: `${id}.html.metadata.json`,
-              body: {
-                ...data,
-                DocumentId: `${id}.html`,
-                Attributes: {
-                  _source_uri: doc.link,
-                  ...job.attr
+            .chain(({ id }) =>
+              doPublishData({
+                name: `${id}.html.metadata.json`,
+                body: {
+                  ...data,
+                  DocumentId: `${id}.html`,
+                  Attributes: {
+                    _source_uri: doc.link,
+                    ...job.attr,
+                  },
                 },
-              },
-              ...job.target
-            }))
+                ...job.target,
+              })
+            )
         )
-        .map(log("Published"))
+        .map(log("Published"));
   }
 
   function doCrawl(job) {
@@ -64,9 +66,10 @@ export default function (
         .map(log("GOT LINKS"))
         .chain(compose(
           Async.all,
-          map(link => doGetContent(link)
-            .map(assoc('link', link))
-            .chain(publish(job)) // <- title, content, link
+          map((link) =>
+            doGetContent(link)
+              .map(assoc("link", link))
+              .chain(publish(job)) // <- title, content, link
           ),
         ))
         .fork(
@@ -110,7 +113,7 @@ function transformToHTML({ title, content }) {
 </html>`;
   const data = {
     Title: title,
-    ContentType: 'HTML'
-  }
-  return ({ html, data })
+    ContentType: "HTML",
+  };
+  return ({ html, data });
 }

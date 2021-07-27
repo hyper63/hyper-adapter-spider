@@ -13,7 +13,7 @@ const crawlerDoc = {
   source: "https://hyper.io",
   depth: 1,
   script: "base64",
-  attr: { _category: '1234' },
+  attr: { _category: "1234" },
   target: {
     url: "https://example.com",
     secret: "secret",
@@ -28,33 +28,31 @@ const getLinks = () =>
 const getContent = () => Promise.resolve({ title: "Hello", content: "World" });
 const publishContent = ({ body }) => {
   const id = sha256(body, "utf-8", "hex");
-  console.log('body', body)
+  console.log("body", body);
   return Promise.resolve({ ok: true, id });
 };
 const publishData = ({ body }) => {
-  console.log('data', body)
+  console.log("data", body);
   return Promise.resolve({ ok: true });
-}
+};
 const env = { getLinks, getContent, publishContent, publishData, aws };
 
-test('manually submit document', async () => {
-  const a = Adapter(env)
+test("manually submit document", async () => {
+  const a = Adapter(env);
   const result = await a.post({
-    app: 'test',
-    name: 'spider',
-    doc: { title: 'Hello', content: 'world', link: 'https://example.com' }
-  })
-  console.log(result)
-  assert(result.ok)
-})
-
+    app: "test",
+    name: "spider",
+    doc: { title: "Hello", content: "world", link: "https://example.com" },
+  });
+  console.log(result);
+  assert(result.ok);
+});
 
 test("start crawl", async () => {
   const a = Adapter(env);
   const result = await a.start("test", "spider");
   assert(result.ok);
 });
-
 
 test("upsert new crawler document", async () => {
   const a = Adapter(env);
