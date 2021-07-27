@@ -14,7 +14,6 @@ export default of()
   .chain((_) =>
     ask((factory) => ({
       s3: new S3(factory),
-      sqs: new SQS(factory),
     }))
   )
   .map(({ s3 }) => ({
