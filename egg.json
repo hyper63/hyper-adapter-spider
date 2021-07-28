@@ -5,7 +5,7 @@
   "description": "Hyper Crawler port adapter for spider",
   "homepage": "https://github.com/hyper63/hyper-adapter-spider",
   "repo": "https://github.com/hyper63/hyper-adapter-spider",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "unstable": false,
   "unlisted": false,
   "files": [
