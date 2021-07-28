@@ -1,10 +1,10 @@
 import "https://deno.land/x/dotenv@v2.0.0/load.ts";
 
-import { sha256 } from "./deps.js";
+import { crocks, sha256 } from "./deps.js";
 import { assert, equal } from "./dev_deps.js";
 import Adapter from "./adapter.js";
 import aws from "./aws_mock.js";
-
+const { Async } = crocks;
 const test = Deno.test;
 
 const crawlerDoc = {
@@ -29,11 +29,11 @@ const getContent = () => Promise.resolve({ title: "Hello", content: "World" });
 const publishContent = ({ body }) => {
   const id = sha256(body, "utf-8", "hex");
   console.log("body", body);
-  return Promise.resolve({ ok: true, id });
+  return Async.Resolved({ ok: true, id });
 };
 const publishData = ({ body }) => {
   console.log("data", body);
-  return Promise.resolve({ ok: true });
+  return Async.Resolved({ ok: true });
 };
 const env = { getLinks, getContent, publishContent, publishData, aws };
 
