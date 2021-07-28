@@ -2,7 +2,7 @@ import { crocks, Queue, R } from "./deps.js";
 
 const { Async } = crocks;
 const queue = new Queue();
-const { assoc, compose, map, prop } = R;
+const { assoc, compose, map, merge, prop } = R;
 
 export default function (
   { getLinks, getContent, publishContent, publishData, aws: { s3 } },
@@ -14,8 +14,6 @@ export default function (
   const listObjects = Async.fromPromise(s3.listObjects);
   const doGetLinks = Async.fromPromise(getLinks);
   const doGetContent = Async.fromPromise(getContent);
-  const doPublishContent = Async.fromPromise(publishContent);
-  const doPublishData = Async.fromPromise(publishData);
 
   function log(msg) {
     return (
@@ -33,14 +31,15 @@ export default function (
         .map(transformToHTML)
         .map(log("Transformed Content"))
         .chain(({ html, data }) =>
-          doPublishContent({
+          publishContent({
             body: html,
             type: "text/html",
             ...job.target,
           })
+            .map(log("Published html doc"))
             // need to send same criteria plus doc. name for doPublishData
             .chain(({ id }) =>
-              doPublishData({
+              publishData({
                 name: `${id}.html.metadata.json`,
                 body: {
                   ...data,
@@ -53,6 +52,7 @@ export default function (
                 ...job.target,
               })
             )
+            .map(log("Published metadata doc"))
         )
         .map(log("Published"));
   }
@@ -67,7 +67,7 @@ export default function (
         .chain(compose(
           Async.all,
           map((link) =>
-            doGetContent(link)
+            doGetContent(link, job.script)
               .map(assoc("link", link))
               .chain(publish(job)) // <- title, content, link
           ),
@@ -94,7 +94,12 @@ export default function (
       getObject(app, name)
         .chain((job) => publish(job)(doc))
         .toPromise(),
-    get: ({ app, name }) => getObject(app, name).toPromise(),
+    get: ({ app, name }) => {
+      console.log({ app, name });
+      return getObject(app, name).map(
+        merge({ id: `${app}-${name}`, app, name }),
+      ).toPromise();
+    },
     "delete": ({ app, name }) => deleteObject(app, name).toPromise(),
     list: (app) => listObjects(app, "").toPromise(),
   });
