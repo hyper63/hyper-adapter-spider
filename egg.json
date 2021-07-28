@@ -10,9 +10,14 @@
   "unlisted": false,
   "files": [
     "./*",
+    "./lib/s3/*",
+    "./lib/spider/*",
     "./lib/*"
   ],
   "ignore": [
+    "./.gitignore",
+    "./.gitpod.Dockerfile",
+    "./.gitpod.yml",
     "./package.json",
     "./scripts/*",
     "./.git*"
@@ -20,5 +25,5 @@
   "checkFormat": false,
   "checkTests": false,
   "checkInstallation": false,
-  "check": false
+  "check": true
 }
